@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder, middleware::Logger};
-use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
+// use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 mod db;
 
@@ -46,12 +46,12 @@ async fn get_user(data: web::Data<AppState>, id: web::Path<String>) -> impl Resp
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-	// TLS setup
-	let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-	builder
-		.set_private_key_file("nopass.pem", SslFiletype::PEM)
-		.unwrap();
-	builder.set_certificate_chain_file("cert.pem").unwrap();
+	// // TLS setup
+	// let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+	// builder
+	// 	.set_private_key_file("nopass.pem", SslFiletype::PEM)
+	// 	.unwrap();
+	// builder.set_certificate_chain_file("cert.pem").unwrap();
 
 	// Logger
 	env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
@@ -70,7 +70,8 @@ async fn main() -> std::io::Result<()> {
 			.wrap(Logger::default())
 			.app_data(web::Data::new(state.clone()))
 	})
-		.bind_openssl(("127.0.0.1", 4000), builder)?
+		// .bind_openssl(("127.0.0.1", 4000), builder)?
+		.bind(("127.0.0.1", 4000))?
 		.run()
 		.await
 }
