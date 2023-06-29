@@ -1,0 +1,34 @@
+version: "3"
+services:
+  back:
+    container_name: back_payment
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "4000:4000"
+    depends_on:
+      - surrealdb
+    environment:
+      - RUST_BACKTRACE=1
+    networks:
+      - surreal_network
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    container_name: surrealdb
+    ports:
+      - "8000:8000"
+    command:
+      - start
+      - --log=trace
+      - --user=root
+      - --pass=root
+    restart: always
+    networks:
+      - surreal_network
+
+networks:
+  surreal_network:
+    external: true
