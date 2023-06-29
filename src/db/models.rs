@@ -1,16 +1,26 @@
+use std::borrow::Cow;
+
 use serde::{Serialize, Deserialize};
 use surrealdb::sql::Thing;
 
-#[derive(Debug, Serialize)]
-pub struct Name<'a> {
-  pub first: &'a str,
-  pub last: &'a str,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Name {
+  pub first: Cow<'static, str>,
+  pub last: Cow<'static, str>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Person {
+  pub id: Thing,
+  pub title: Cow<'static, str>,
+  pub name: Name,
+  pub marketing: bool,
 }
 
 #[derive(Debug, Serialize)]
-pub struct Person<'a> {
+pub struct CreatePerson<'a> {
   pub title: &'a str,
-  pub name: Name<'a>,
+  pub name: Name,
   pub marketing: bool,
 }
 

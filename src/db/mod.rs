@@ -6,7 +6,7 @@ use surrealdb::{Surreal, Result};
 
 pub mod models;
 
-use self::models::{Record, Person, Name};
+use self::models::{Record, Person, Name, CreatePerson};
 
 pub struct DB {
   surreal: Surreal<Client>,
@@ -15,6 +15,7 @@ pub struct DB {
 impl DB {
   pub async fn new() -> Self {
     let surreal = Surreal::new::<Ws>("127.0.0.1:8000").await.unwrap();
+    // let surreal = Surreal::new::<Ws>("surrealdb").await.unwrap();
 
     surreal.signin(Root {
       username: "root",
@@ -29,11 +30,11 @@ impl DB {
     }
   }
   pub async fn new_person(&self) -> Result<Record> {
-    let person = Person {
+    let person = CreatePerson {
       title: "Mr.",
       name: Name {
-        first: "John",
-        last: "Doe",
+        first: "John".into(),
+        last: "Doe".into(),
       },
       marketing: true,
     };
@@ -48,5 +49,14 @@ impl DB {
     let user = self.surreal.select(("person", id)).await?;
 
     Ok(user)
+  }
+
+  pub async fn all_users(&self) -> Result<Vec<Person>> {
+    // Perform a custom advanced query
+    let users = self.surreal
+      .select("person")
+      .await?;
+
+    Ok(users)
   }
 }

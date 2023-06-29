@@ -4,8 +4,12 @@ use actix_web::{get, web, App, HttpResponse, HttpServer, Responder, middleware::
 // use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 mod db;
+mod routes;
 
 use db::{DB};
+use routes::config::ConfigRouter;
+use routes::transaction::TransactionRouter;
+use routes::user::UserRouter;
 
 #[derive(Clone)]
 struct AppState {
@@ -13,35 +17,8 @@ struct AppState {
 }
 
 #[get("/")]
-async fn hello(data: web::Data<AppState>) -> impl Responder {
-	match data.db.new_person().await {
-		Ok(person) => {
-			log::info!("Created person");
-			HttpResponse::Ok().json(person)
-		},
-		Err(e) => {
-			log::error!("Error creating person: {}", e);
-			HttpResponse::InternalServerError().body("Error creating person")
-		},
-	}
-}
-
-#[get("/user/{id}/")]
-async fn get_user(data: web::Data<AppState>, id: web::Path<String>) -> impl Responder {
-	// println!("{:?}", id);
-	let id = id.into_inner();
-	log::info!("Got id: {}", id);
-	let id = id.split(":").collect::<Vec<&str>>()[1];
-	match data.db.get_user(id).await {
-		Ok(user) => {
-			log::info!("Got user");
-			HttpResponse::Ok().json(user)
-		},
-		Err(e) => {
-			log::error!("Error getting user: {}", e);
-			HttpResponse::InternalServerError().body("Error getting user")
-		},
-	}
+async fn hello() -> impl Responder {
+	HttpResponse::Ok().body("Hello world!")
 }
 
 #[actix_web::main]
@@ -66,7 +43,9 @@ async fn main() -> std::io::Result<()> {
 	HttpServer::new(move || {
 		App::new()
 			.service(hello)
-			.service(get_user)
+			.service(ConfigRouter::new())
+			.service(TransactionRouter::new())
+			.service(UserRouter::new())
 			.wrap(Logger::default())
 			.app_data(web::Data::new(state.clone()))
 	})
