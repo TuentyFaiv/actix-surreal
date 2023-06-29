@@ -17,9 +17,9 @@ pub struct Person {
   pub marketing: bool,
 }
 
-#[derive(Debug, Serialize)]
-pub struct CreatePerson<'a> {
-  pub title: &'a str,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CreatePerson {
+  pub title: Cow<'static, str>,
   pub name: Name,
   pub marketing: bool,
 }
